@@ -1,0 +1,21 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+    <h1 class="py-3">Recent Posts</h1>
+    {% for post in posts %}
+        <div class="border p-3 mb-2 bg-secondary-subtle">
+            <h5>{{post.title}}</h5>
+            <p>{{post.description}}</p>
+            <hr>
+            <div class="d-flex justify-content-between align-items-center">
+                <small>{{post.created_at}} by {{post.author.username}}</small>
+                {% if user.is_authenticated and post.author == user or perms.main.change_post or perms.main.delete_post %}
+                <div>
+                    <a href="{% url 'edit_post' post.pk %}" class="btn btn-primary btn-sm">Edit</a>
+                    <a href="{% url 'delete_post' post.pk %}" class="btn btn-danger btn-sm">Delete</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
