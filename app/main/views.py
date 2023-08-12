@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.models import User, Group
 
 from .forms import RegisterationForm, PostForm
 from .models import Post
@@ -50,6 +51,18 @@ def delete_post(request, pk):
     post = get_object_or_404(Post, pk=pk)
     if post.author == request.user or request.user.has_perm('main.delete_post'):
         post.delete()
+    return redirect('/home')
+
+
+@login_required(login_url='/login')
+def ban_user(request, ban_user_pk):
+    user = get_object_or_404(User, pk=ban_user_pk)
+    if request.user.is_staff:
+        group = Group.objects.filter(name="default").first()
+        group.user_set.remove(user)
+        group = Group.objects.filter(name="mod").first()
+        group.user_set.remove(user)
+
     return redirect('/home')
 
 
